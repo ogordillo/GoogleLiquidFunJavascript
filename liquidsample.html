@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>LiquidFun Template</title>
+	<style type="text/css">
+	body {
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+	}
+	</style>
+	<script type="text/javascript" src="js/liquidfun.js"></script>
+	<script type="text/javascript" src="js/pixi.min.js"></script>
+	<script type="text/javascript" src="js/pixi_liquid_renderer.js"></script>
+	
+</head>
+<body>
+<script type="text/javascript">
+
+
+var world; //our liquid fun world
+var bodyDef //sprite body definition
+
+var spriteBodies = [];  //sprite physics position
+var spriteImage = [];   //sprite image appearance
+
+var spriteFixture;  //sprite body definition
+var mousedown = false;  //mouse down tracker
+var mousedelay = 20;   //mouse createSprite delay hack
+var psd;				//particle system definition
+var particleSystem;		//particle system
+
+
+var renderer;		//pixi renderer
+var graphics;		//pixi graphics
+var stage;				//stage container
+
+//when this window loads. 
+window.onload = function() 
+{
+	//get the pixi renderer
+	renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight);
+	document.body.appendChild(renderer.view);
+
+	//construct our stage, graphics and containers
+	stage = new PIXI.Container();
+	graphics = new PIXI.Graphics();
+
+	//preload the background, turn on the graphics
+	PIXI.loader.
+		add('backgroundimg', 'sprites/background.jpg').
+		load(function (loader, resources) {
+
+			//set the background image
+			setBackgroundToStage(stage, resources.backgroundimg.texture, 1920, 1444)
+
+			//initialize the pixi graphics
+			initializeGraphics(stage, graphics);
+
+			//load the first liquidfun colliders
+			onAssetsLoaded();
+	});
+
+	//set up the background image (maintains aspect ratio)
+	function setBackgroundToStage(stageref, imageref, imagewidth, imageheight)
+	{
+
+		let imagetexture = imageref;
+		var background = new PIXI.Sprite(imagetexture);
+		var scaleX = window.innerWidth/imagewidth;
+		var scaleY = window.innerHeight/imageheight;    
+		background.scale.set(scaleX , scaleY );
+		background.anchor.x = 0.5;
+		background.anchor.y = 0.5;
+		background.position.x = window.innerWidth/2;
+		background.position.y = window.innerHeight/2;
+		stageref.addChild( background );
+	}
+
+	//set up the graphics with a bit of a blur on the particles
+	function initializeGraphics(stageref, graphicsref)
+	{
+		var blurfilter = new PIXI.filters.BlurFilter();
+		blurfilter.blur = 7;
+		blurfilter.blendMode = 3;
+		graphicsref.filters = [blurfilter];
+		stageref.addChild(graphicsref);
+	}
+
+	//setup the initial physics of the game
+	function onAssetsLoaded(resources) 
+	{
+		// The Liquid Fun part! :))
+
+		//init the world
+		const gravity = new b2Vec2(0, 10);
+		world = new b2World(gravity);
+
+		//static geometries
+	 	bodyDef = new b2BodyDef();
+	 	
+	 	//bottom
+		bodyDef.position.Set(0, window.innerHeight / 100, 0);
+		var worldBound = new b2EdgeShape;
+  		worldBound.Set(new b2Vec2(-50.0, 0.0), new b2Vec2(50.0, 0.0));
+		world.CreateBody(bodyDef).CreateFixtureFromShape(worldBound, 0)
+		//left
+		bodyDef.position.Set(0, 0);
+		worldBound = new b2EdgeShape();
+		worldBound.Set(new b2Vec2(0.0, 0.0), new b2Vec2(0.0,10.0));
+		world.CreateBody(bodyDef).CreateFixtureFromShape(worldBound, 0);
+		//right
+		bodyDef.position.Set(window.innerWidth / 100, 0);
+		worldBound = new b2EdgeShape();
+		worldBound.Set(new b2Vec2(0.0, 0.0), new b2Vec2(0.0,10.0));
+		world.CreateBody(bodyDef).CreateFixtureFromShape(worldBound, 0);
+		
+		bodyDef.type = b2_dynamicBody;
+
+
+		//Dynamic geometries
+		spriteFixture = new b2FixtureDef();
+
+		//sprite geometrics
+		spriteFixture.shape = new b2CircleShape();
+		spriteFixture.density = 0.8;
+		spriteFixture.restitution = 0.7;
+        spriteFixture.friction = 0.5;
+		spriteFixture.shape.radius = 10 / 100;
+
+		//create a particle system (not the particles)
+	  	psd = new b2ParticleSystemDef();
+	  	psd.radius = 0.1;
+		particleSystem = world.CreateParticleSystem(psd);
+
+		//start updating every frame
+		loopupdate()
+	}
+
+	//updates every frame
+	function loopupdate() 
+	{
+		requestAnimationFrame(loopupdate);
+
+		//ask the world to continue at 40fps
+		world.Step(1/40, 3, 3);
+
+		//update our sprite image positions
+		//to match their physics counterparts
+		for (var i in spriteBodies) {
+			var position = spriteBodies[i].GetPosition();
+			var angle = spriteBodies[i].GetAngle();
+			spriteImage[i].position.x = position.x * 100;
+			spriteImage[i].position.y = position.y * 100;
+			spriteImage[i].rotation = angle;
+		}
+
+		//update the particles too
+		renderPixiWithLiquidFun();
+
+		//render everything in stage
+		renderer.render(stage);
+	};
+
+
+	//when mouseup create a sprite
+	function createSprite(x, y) 
+	{
+			//create a sprite 
+			var sprite = new PIXI.Sprite.fromImage('sprites/particlespriteimg.png');
+			sprite.position.x = x;
+			sprite.position.y = y;
+			sprite.anchor.x = 0.5;
+			sprite.anchor.y = 0.5;
+			stage.addChild(sprite);
+
+			//push sprite to list of tracked sprites
+			spriteImage.push(sprite);
+
+			//create a sprite physics body
+			bodyDef.position.Set(x / 100, y / 100);
+			var spriteBody = world.CreateBody(bodyDef);
+			spriteBody.CreateFixtureFromDef(spriteFixture);
+
+			//push body to list of tracked bodies
+			spriteBodies.push(spriteBody);
+		
+		
+	}
+
+	//create a group of particles
+	function createParticles(x, y) 
+	{
+
+		//generate a shape
+		var circle = new b2CircleShape();
+		circle.radius = 0.5;
+
+		//define the type of group
+		var pgd = new b2ParticleGroupDef();
+		pgd.flags = b2_waterParticle;
+		pgd.shape = circle;
+		pgd.position.Set(x/100, y/100);
+
+		//create in the system
+		particleSystem.CreateParticleGroup(pgd);
+		
+	}
+
+	//Pixi rendering particles
+	function renderPixiWithLiquidFun() 
+	{
+		//get the first particle system in this world
+		particles = world.particleSystems[0].GetPositionBuffer();
+
+		//clear the graphics canvas
+		graphics.clear();
+
+		//color of our graphics
+		graphics.beginFill(0xFFFFFF);
+		
+		//create a pixi rect everywhere their is a 
+		//liquid fun particle
+		for(var j=0, pl = particles.length; j < pl; j += 2) {
+			//graphics.drawRect(x, y, width, height)
+			graphics.drawRect(particles[j] * 100, particles[j+1] * 100, 15, 15);
+		}
+	}
+
+
+	//All hail the DOM
+
+	//on mouse move
+	document.addEventListener("mousemove", function(e) 
+	{
+		if(mousedown & mousedelay == 0){
+			createParticles(e.clientX, e.clientY);
+			mousedelay = 20;
+		}else if(mousedown){
+			mousedelay -=1;
+		}
+	})
+
+	//on mouse down
+	document.addEventListener("mousedown", function(e) 
+	{
+		mousedown = true;
+		createParticles(e.clientX, e.clientY);
+	})
+
+	//on mouse up
+	document.addEventListener("mouseup", function(e) 
+	{
+		mousedown = false;
+		createSprite(e.clientX, e.clientY);
+	})
+}
+
+</script>
+</body>
+</html>

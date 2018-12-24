@@ -195,7 +195,7 @@ window.onload = function()
 		spriteFixture.density = 0.8;
 		spriteFixture.restitution = 0.7;
         spriteFixture.friction = 0.5;
-		spriteFixture.shape.radius = 0.75;
+		spriteFixture.shape.radius = 0.75*window.innerWidth/1920;
 
 		//create a particle system (not the particles)
 	  	psd = new b2ParticleSystemDef();
@@ -224,6 +224,13 @@ window.onload = function()
 			spriteImage[i].rotation = angle;
 		}
 
+		if(mousedown & mousedelay == 0){
+			createParticles((window.innerWidth / 100*18), (window.innerHeight / 100*72));
+			mousedelay = 10;
+		}else if(mousedown){
+			mousedelay -=1;
+		}
+
 		//update the particles too
 		renderPixiWithLiquidFun();
 
@@ -239,6 +246,9 @@ window.onload = function()
 			var sprite = new PIXI.Sprite.fromImage('sprites/cookie2.png');
 			sprite.position.x = x;
 			sprite.position.y = y;
+			var scaleX = window.innerWidth/1920;
+			var scaleY = window.innerHeight/1080;    
+			sprite.scale.set(scaleX , scaleY );
 			sprite.anchor.x = 0.5;
 			sprite.anchor.y = 0.5;
 			stage.addChild(sprite);
@@ -304,18 +314,14 @@ window.onload = function()
 	//on mouse move
 	document.addEventListener("mousemove", function(e) 
 	{
-		if(mousedown & mousedelay == 0){
-			createParticles(e.clientX, e.clientY);
-			mousedelay = 10;
-		}else if(mousedown){
-			mousedelay -=1;
-		}
+		
 	})
 
 	//on mouse down
 	document.addEventListener("mousedown", function(e) 
 	{
 		mousedown = true;
+
 		
 	})
 

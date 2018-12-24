@@ -29,7 +29,7 @@ var platewallpositions = [];
 
 var spriteFixture;  //sprite body definition
 var mousedown = false;  //mouse down tracker
-var mousedelay = 20;   //mouse createSprite delay hack
+var mousedelay = 10;   //mouse createSprite delay hack
 var psd;				//particle system definition
 var particleSystem;		//particle system
 
@@ -55,7 +55,7 @@ window.onload = function()
 		load(function (loader, resources) {
 
 			//set the background image
-			setBackgroundToStage(stage, resources.backgroundimg.texture, 1920, 1440)
+			setBackgroundToStage(stage, resources.backgroundimg.texture, 1920, 1440);
 
 
 			//initialize the pixi graphics
@@ -107,10 +107,10 @@ window.onload = function()
 		cupwallpositions.push(new b2Vec2((window.innerWidth/ 100*0.32), (window.innerHeight/ 100*0.09)));
 
 		//plate vertices
-		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.31), (window.innerHeight / 100*0.70)));
-		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.60), (window.innerHeight / 100*0.73)));
-		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.80), (window.innerHeight / 100*0.74)));
-		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 1.0), (window.innerHeight / 100*0.74)));
+		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.31), (window.innerHeight / 100*0.68)));
+		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.60), (window.innerHeight / 100*0.72)));
+		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.80), (window.innerHeight / 100*0.73)));
+		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 1.0), (window.innerHeight / 100*0.62)));
 
 
 		//init the world
@@ -195,7 +195,7 @@ window.onload = function()
 		spriteFixture.density = 0.8;
 		spriteFixture.restitution = 0.7;
         spriteFixture.friction = 0.5;
-		spriteFixture.shape.radius = 0.5;
+		spriteFixture.shape.radius = 0.75;
 
 		//create a particle system (not the particles)
 	  	psd = new b2ParticleSystemDef();
@@ -306,7 +306,7 @@ window.onload = function()
 	{
 		if(mousedown & mousedelay == 0){
 			createParticles(e.clientX, e.clientY);
-			mousedelay = 20;
+			mousedelay = 10;
 		}else if(mousedown){
 			mousedelay -=1;
 		}

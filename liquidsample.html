@@ -18,9 +18,9 @@
 
 
 var world; //our liquid fun world
-var bodyDef //sprite body definition
-var bodyDef2;
-var bodyDef3;
+var bodyDef //canvas body definition
+var bodyDef2; //cup body definition
+var bodyDef3; //plate body definition
 
 var spriteBodies = [];  //sprite physics position
 var spriteImage = [];   //sprite image appearance
@@ -96,7 +96,7 @@ window.onload = function()
 	{
 		// The Liquid Fun part! :))
 
-
+		//cup vertices
 		cupwallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.0), (window.innerHeight / 100*0.07)));
 		cupwallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.045), (window.innerHeight / 100*0.50)));
 		cupwallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.025), (window.innerHeight / 100*0.67)));
@@ -106,6 +106,7 @@ window.onload = function()
 		cupwallpositions.push(new b2Vec2((window.innerWidth/ 100*0.26), (window.innerHeight/ 100*0.50)));
 		cupwallpositions.push(new b2Vec2((window.innerWidth/ 100*0.32), (window.innerHeight/ 100*0.09)));
 
+		//plate vertices
 		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.31), (window.innerHeight / 100*0.70)));
 		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.60), (window.innerHeight / 100*0.73)));
 		platewallpositions.push(new b2Vec2((window.innerWidth / 100 * 0.80), (window.innerHeight / 100*0.74)));
@@ -159,12 +160,10 @@ window.onload = function()
 		worldBound = new b2EdgeShape();
 		worldBound.Set(cupwallpositions[4], cupwallpositions[5]);
 		world.CreateBody(bodyDef2).CreateFixtureFromShape(worldBound, 0);
-
 		bodyDef2.position.Set(0, 0);
 		worldBound = new b2EdgeShape();
 		worldBound.Set(cupwallpositions[5], cupwallpositions[6]);
 		world.CreateBody(bodyDef2).CreateFixtureFromShape(worldBound, 0);
-
 		bodyDef2.position.Set(0, 0);
 		worldBound = new b2EdgeShape();
 		worldBound.Set(cupwallpositions[6], cupwallpositions[7]);
@@ -177,18 +176,14 @@ window.onload = function()
 		worldBound = new b2EdgeShape();
 		worldBound.Set(platewallpositions[0], platewallpositions[1]);
 		world.CreateBody(bodyDef3).CreateFixtureFromShape(worldBound, 0);
-
 		bodyDef3.position.Set(0, 0);
 		worldBound = new b2EdgeShape();
 		worldBound.Set(platewallpositions[1], platewallpositions[2]);
 		world.CreateBody(bodyDef3).CreateFixtureFromShape(worldBound, 0);
-
 		bodyDef3.position.Set(0, 0);
 		worldBound = new b2EdgeShape();
 		worldBound.Set(platewallpositions[2], platewallpositions[3]);
 		world.CreateBody(bodyDef3).CreateFixtureFromShape(worldBound, 0);
-
-
 		bodyDef3.type = b2_dynamicBody;
 
 

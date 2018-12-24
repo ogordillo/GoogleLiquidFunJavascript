@@ -317,6 +317,21 @@ window.onload = function()
 		
 	})
 
+
+	//on touch starting
+	document.body.addEventListener('touchstart', function(e){
+        mousedown = true;
+    }, false)
+
+
+    //on touch cancel
+	document.body.addEventListener('touchend', function(e){
+        mousedown = false;
+        var touchobj = e.changedTouches[0]
+		createSprite(parseInt(touchobj.clientX), parseInt(touchobj.clientY));
+    }, false)
+
+
 	//on mouse down
 	document.addEventListener("mousedown", function(e) 
 	{

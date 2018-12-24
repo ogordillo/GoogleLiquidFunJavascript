@@ -11,7 +11,7 @@
 	</style>
 	<script type="text/javascript" src="js/liquidfun.js"></script>
 	<script type="text/javascript" src="js/pixi.min.js"></script>
-	
+	<div>Click to place a cookie, Click+Hold to fill the glass</div>
 </head>
 <body>
 <script type="text/javascript">
@@ -199,7 +199,7 @@ window.onload = function()
 
 		//create a particle system (not the particles)
 	  	psd = new b2ParticleSystemDef();
-	  	psd.radius = 0.1;
+	  	psd.radius = 0.1 * window.innerHeight/1080;
 		particleSystem = world.CreateParticleSystem(psd);
 
 		//start updating every frame
@@ -273,7 +273,7 @@ window.onload = function()
 
 		//generate a shape
 		var circle = new b2CircleShape();
-		circle.radius = 0.5;
+		circle.radius = 0.5 * window.innerHeight/1080;
 
 		//define the type of group
 		var pgd = new b2ParticleGroupDef();
@@ -304,7 +304,7 @@ window.onload = function()
 		//liquid fun particle
 		for(var j=0, pl = particles.length; j < pl; j += 2) {
 			//graphics.drawRect(x, y, width, height)
-			graphics.drawRect(particles[j] * 100, particles[j+1] * 100, 20, 20);
+			graphics.drawRect(particles[j] * 100, particles[j+1] * 100 , 20* window.innerWidth/1920, 20*window.innerHeight/1080);
 		}
 	}
 
